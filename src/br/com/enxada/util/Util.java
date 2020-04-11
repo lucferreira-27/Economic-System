@@ -2,7 +2,10 @@ package br.com.enxada.util;
 
 import org.bukkit.ChatColor;
 
+import br.com.enxada.Main;
+
 public class Util {
+	
 	public static String chat(String s) {
 		return ChatColor.translateAlternateColorCodes('&', s);
 //		&0 Black
@@ -22,4 +25,14 @@ public class Util {
 //		&e Yellow
 //		&f White
 	}
+	
+	public static void clearChat() {
+		Main plugin = Main.getPlugin(Main.class);
+		for(int i = 0; i < 250; i++)
+			plugin.getServer().broadcastMessage("");
+		
+		plugin.getServer().broadcastMessage(chat("&6--------- CHAT APAGADO! ---------"));
+	}
+	
+
 }

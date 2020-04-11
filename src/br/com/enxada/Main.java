@@ -11,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import br.com.enxada.events.Events;
 import br.com.enxada.exceptions.DbException;
+import br.com.enxada.exceptions.EconomicException;
 import br.com.enxada.util.Util;
 
 public class Main extends JavaPlugin implements Listener {
@@ -26,18 +27,20 @@ public class Main extends JavaPlugin implements Listener {
 		
 		Events event = new Events();
 		getServer().getPluginManager().registerEvents((Listener) new Events(), (Plugin) this);
-		loadDatabase();
 		
-		System.out.println(Util.chat("&8Plugin Economic System - Online"));
-		Bukkit.broadcastMessage(Util.chat("&2Plugin Economic System  - Online"));
+		
+		System.out.println(Util.chat("Plugin Economic System - Online"));
+
+		if(!loadDatabase())
+			onDisable();
 	}
 	
 	@Override
 	public void onDisable() {
-		System.out.println(Util.chat("&4Plugin Economic System - Offline"));
+		System.out.println(Util.chat("Plugin Economic System - Offline"));
 		
 		
-		
+		Util.clearChat();
 		Bukkit.broadcastMessage(Util.chat("&4Plugin Economic System - Offline"));
 	}
 	public void loadConfig() {
@@ -56,12 +59,12 @@ public class Main extends JavaPlugin implements Listener {
 
 	}
 	
-	public void loadDatabase() {
+	public boolean loadDatabase() {
 		loadConfig();
 		try {
 			synchronized (this) {
 				if(getConnection() != null && !getConnection().isClosed()) {
-					return;
+					return false;
 				}
 			}
 			
@@ -70,13 +73,17 @@ public class Main extends JavaPlugin implements Listener {
 			
 
 			Bukkit.broadcastMessage(Util.chat("&5Economic System Database - ONLINE "));
-			System.out.println(Util.chat("&5Economic System Database - ONLINE "));
+			System.out.println(Util.chat("Economic System Database - ONLINE "));
+			return true;
 		}catch (SQLException e) {
 			// TODO: handle exception
 			e.printStackTrace();
+			throw new DbException(e.getMessage());
+			
 		}catch (ClassNotFoundException e) {
 			// TODO: handle exception
 			e.printStackTrace();
+			throw new EconomicException(e.getMessage());
 		}
 		
 	}
