@@ -96,5 +96,30 @@ public class Main extends JavaPlugin implements Listener {
 		this.connection = connection;
 	}
 
+	public String getHost() {
+		return host;
+	}
+
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public String getPort() {
+		return port;
+	}
+
+	public String getTablePlayers() {
+		return tablePlayers;
+	}
+
+	public String getTableMarket() {
+		return tableMarket;
+	}
+	
 	
 }
