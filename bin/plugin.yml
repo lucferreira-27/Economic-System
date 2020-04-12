@@ -2,5 +2,14 @@ name: EconomicSystem
 version: 1.0
 main: br.com.enxada.Main
 commands:
+    saldo:
+        usage: /<command>
+        description: Exibe saldo de um usuario
+    atualizarsaldo:
+        usage: /<command>
+        description: Atualiza saldo de um usuario
+    deletarconta:
+        usage: /<command>
+        description: Deleta a conta de um usuario no banco de dados        
 
   

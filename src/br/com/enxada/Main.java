@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import br.com.enxada.commands.Commands;
 import br.com.enxada.events.Events;
 import br.com.enxada.exceptions.DbException;
 import br.com.enxada.exceptions.EconomicException;
@@ -28,6 +29,11 @@ public class Main extends JavaPlugin implements Listener {
 		Events event = new Events();
 		getServer().getPluginManager().registerEvents((Listener) new Events(), (Plugin) this);
 		
+		Commands cmd = new Commands();
+		
+		getCommand(cmd.getCmdSaldo()).setExecutor(cmd);
+		getCommand(cmd.getCmdAtualizarSaldo()).setExecutor(cmd);
+		getCommand(cmd.getCmdDeletarConta()).setExecutor(cmd);
 		
 		System.out.println(Util.chat("Plugin Economic System - Online"));
 
