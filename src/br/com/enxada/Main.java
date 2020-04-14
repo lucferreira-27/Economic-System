@@ -20,6 +20,7 @@ public class Main extends JavaPlugin implements Listener {
 	private String host, database, username, password;
 	private String port;
 	private String tablePlayers, tableMarket;
+	private String dbURL = "";
 	
 
 	
@@ -34,7 +35,10 @@ public class Main extends JavaPlugin implements Listener {
 		getCommand(cmd.getCmdSaldo()).setExecutor(cmd);
 		getCommand(cmd.getCmdAtualizarSaldo()).setExecutor(cmd);
 		getCommand(cmd.getCmdDeletarConta()).setExecutor(cmd);
+		getCommand(cmd.getCmdAddConta()).setExecutor(cmd);
+		getCommand(cmd.getCmdListarPlayers()).setExecutor(cmd);
 		
+		getCommand(cmd.getCmdAddItem()).setExecutor(cmd);
 		System.out.println(Util.chat("Plugin Economic System - Online"));
 
 		if(!loadDatabase())
@@ -67,16 +71,19 @@ public class Main extends JavaPlugin implements Listener {
 	
 	public boolean loadDatabase() {
 		loadConfig();
-		try {
+	    
+		this.dbURL += "jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database + "?characterEncoding=utf8"; 
+		
+	    try {
 			synchronized (this) {
 				if(getConnection() != null && !getConnection().isClosed()) {
 					return false;
 				}
 			}
+			//setConnection(DriverManager.getConnection(this.host +":"+this.port+"/"+this.database, this.username, this.password));
 			
 			Class.forName("com.mysql.jdbc.Driver");
-			setConnection(DriverManager.getConnection(this.host +":"+this.port+"/"+this.database, this.username, this.password));
-			
+			setConnection(DriverManager.getConnection(dbURL,this.username,this.password));
 
 			Bukkit.broadcastMessage(Util.chat("&5Economic System Database - ONLINE "));
 			System.out.println(Util.chat("Economic System Database - ONLINE "));
@@ -86,7 +93,8 @@ public class Main extends JavaPlugin implements Listener {
 			e.printStackTrace();
 			throw new DbException(e.getMessage());
 			
-		}catch (ClassNotFoundException e) {
+		}
+		catch (ClassNotFoundException e) {
 			// TODO: handle exception
 			e.printStackTrace();
 			throw new EconomicException(e.getMessage());

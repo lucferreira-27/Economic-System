@@ -2,6 +2,7 @@ package br.com.enxada.util;
 
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -44,6 +45,33 @@ public class Util {
 			return (Player) plugin.getServer().getOfflinePlayer(uuid);
 		}
 		
+	}
+	
+	public static boolean isNumber(String c) {
+		
+		for(int i = 0; i < c.length(); i++) {
+			
+			if(Character.isDigit(c.charAt(i))) {
+				continue;
+			}
+			
+			
+			return false;
+			
+			
+		}
+ 
+		 return true;
+	}
+	
+	public static boolean isPlayer(String player) {
+		if(Bukkit.getPlayer(player) != null) {
+			return true;
+		}
+		if(Bukkit.getOfflinePlayer(player) != null) {
+			return true;
+		}
+		return false;
 	}
 	
 

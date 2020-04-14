@@ -10,6 +10,15 @@ commands:
         description: Atualiza saldo de um usuario
     deletarconta:
         usage: /<command>
-        description: Deleta a conta de um usuario no banco de dados        
+        description: Deleta a conta de um usuario no banco de dados
+    addconta:
+        usage: /<command>
+        description: Adiciona a conta de um usuario no banco de dados
+    listarplayers:
+        usage: /<command>
+        description: Lista jogadores do banco de dados
+    additem:
+        usage: /<command>
+        description: Adiciona um item ao banco de dados                         
 
   

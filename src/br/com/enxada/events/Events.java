@@ -18,7 +18,8 @@ public class Events implements Listener {
 		
 		Player player = event.getPlayer(); 
 		
-		tablePlayer.addPlayer(player);
+		if(!tablePlayer.playerExist(player.getUniqueId()))
+			tablePlayer.addPlayer(player);
 	 }
 	 
 }

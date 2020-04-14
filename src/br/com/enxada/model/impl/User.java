@@ -53,7 +53,7 @@ public class User implements UserDAO {
 			st.setString(2, player.getDisplayName());
 			st.setDouble(3, 1000.00);
 			st.executeUpdate();
-			player.sendMessage(Util.chat("&5[Player Adicionado]"));
+			player.sendMessage(Util.chat("&a[Player Adicionado]"));
 		}else {
 			player.sendMessage(Util.chat("&cERROR: Player já adicionado"));
 		}
@@ -96,7 +96,7 @@ public class User implements UserDAO {
 				Bukkit.broadcastMessage(Util.chat("&5PLAYER &c" +player.getDisplayName() +" &5FOI DELETADO"));
 				return;
 			}
-			throw new DbException("Player não existe no banco de dados");
+			
 		}catch (SQLException e) {
 			// TODO: handle exception
 			throw new DbException(e.getMessage());
@@ -117,7 +117,7 @@ public class User implements UserDAO {
 				Bukkit.broadcastMessage(Util.chat("&5PLAYER &c" +player.getName() +"&5FOI DELETADO"));
 				return;
 			}
-			throw new DbException("Player não existe no banco de dados");
+			
 		}catch (SQLException e) {
 			// TODO: handle exception
 			throw new DbException(e.getMessage());
@@ -170,6 +170,19 @@ public class User implements UserDAO {
 			throw new DbException(e.getMessage());
 		}
 	
+	}
+	public List<Player> listPlayers(){
+		List<Player> listPlayer = new ArrayList<>();
+		List<String> listName = new ArrayList<>();
+		listName = listPlayersNames();
+		
+		for(String name : listName) {
+			
+			Player p = Bukkit.getPlayer(name);
+			listPlayer.add(p);
+			
+		}
+		return listPlayer;
 	}
 
 }
