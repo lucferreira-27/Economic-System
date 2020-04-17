@@ -10,11 +10,11 @@ public interface MarketDAO {
 	void addItem(int id);
 	void addItem(int id,double price);
 	void deleteItem(int id);
-	void updateItem(int id,String name, double value);
+	void updateItem(int id, double value);
 	
 	ItemStack findItem();
 	
-	double getPrice();
+	double getPrice(int id);
 	
 	List<ItemStack> listItens();
 	

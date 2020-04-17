@@ -10,6 +10,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import br.com.enxada.commands.Commands;
+import br.com.enxada.commands.CommandsMarket;
+import br.com.enxada.commands.CommandsUser;
 import br.com.enxada.events.Events;
 import br.com.enxada.exceptions.DbException;
 import br.com.enxada.exceptions.EconomicException;
@@ -31,18 +33,26 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents((Listener) new Events(), (Plugin) this);
 		
 		Commands cmd = new Commands();
+		CommandsUser cmdUser = new CommandsUser();
+		CommandsMarket cmdMarket = new CommandsMarket();
 		
-		getCommand(cmd.getCmdSaldo()).setExecutor(cmd);
-		getCommand(cmd.getCmdAtualizarSaldo()).setExecutor(cmd);
-		getCommand(cmd.getCmdDeletarConta()).setExecutor(cmd);
-		getCommand(cmd.getCmdAddConta()).setExecutor(cmd);
-		getCommand(cmd.getCmdListarPlayers()).setExecutor(cmd);
+		getCommand(cmdUser.getCmdSaldo()).setExecutor(cmdUser);
+		getCommand(cmdUser.getCmdAtualizarSaldo()).setExecutor(cmdUser);
+		getCommand(cmdUser.getCmdDeletarConta()).setExecutor(cmdUser);
+		getCommand(cmdUser.getCmdAddConta()).setExecutor(cmdUser);
+		getCommand(cmdUser.getCmdListarPlayers()).setExecutor(cmdUser);
 		
-		getCommand(cmd.getCmdAddItem()).setExecutor(cmd);
+		getCommand(cmdMarket.getCmdAddItem()).setExecutor(cmdMarket);
+		getCommand(cmdMarket.getCmdPreço()).setExecutor(cmdMarket);
+		getCommand(cmdMarket.getCmdRemoveItem()).setExecutor(cmdMarket);
+		getCommand(cmdMarket.getCmdAtualizaritem()).setExecutor(cmdMarket);
+		getCommand(cmdMarket.getCmdListarItens()).setExecutor(cmdMarket);
+		
 		System.out.println(Util.chat("Plugin Economic System - Online"));
 
 		if(!loadDatabase())
 			onDisable();
+
 	}
 	
 	@Override

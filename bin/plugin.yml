@@ -20,5 +20,15 @@ commands:
     additem:
         usage: /<command>
         description: Adiciona um item ao banco de dados                         
-
-  
+    preço:
+        usage: /<command>
+        description: Exibe valor de um item do banco de dados
+    removeritem:
+        usage: /<command>
+        description: Remove um item do banco de dados
+    atualizaritem:
+        usage: /<command>
+        description: Atualiza o preço de um item no banco de dados
+    listaritems:
+        usage: /<command>
+        description: Lista o nome de itens no banco de dados         
