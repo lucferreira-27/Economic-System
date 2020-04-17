@@ -54,6 +54,7 @@ public class Util {
 
 	}
 
+
 	public static boolean isNumber(String c) {
 
 		for (int i = 0; i < c.length(); i++) {
@@ -193,6 +194,14 @@ public class Util {
 
 		return 0;
 
+	}
+	public static String getId(Player player) {
+		UUID uuid = player.getUniqueId();
+		
+		return uuid.toString();
+	}
+	public static int getId(ItemStack item) {
+		return 0;
 	}
 
 	public static <T> Map<Integer, List> divList(List<T> list, int size) {
