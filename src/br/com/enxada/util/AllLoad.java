@@ -7,7 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import br.com.enxada.commands.Commands;
 import br.com.enxada.commands.CommandsMarket;
 import br.com.enxada.commands.CommandsUser;
-import br.com.enxada.events.Events;
+import br.com.enxada.events.EventsJoin;
 
 public class AllLoad extends JavaPlugin {
 	public void allLoad() {
@@ -30,8 +30,8 @@ public class AllLoad extends JavaPlugin {
 	}
 	
 	public void loadEvents() {
-		Events event = new Events();
-		getServer().getPluginManager().registerEvents((Listener) new Events(), (Plugin) this);
+		EventsJoin event = new EventsJoin();
+		getServer().getPluginManager().registerEvents((Listener) new EventsJoin(), (Plugin) this);
 	}
 	
 }

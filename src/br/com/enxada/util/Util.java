@@ -9,11 +9,12 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import br.com.enxada.Main;
-import br.com.enxada.model.impl.Market;
+import br.com.enxada.exceptions.EconomicException;
 
 public class Util {
 	private static Main plugin = Main.getPlugin(Main.class);
@@ -46,14 +47,14 @@ public class Util {
 	}
 
 	public static Player fromUUID(UUID uuid) {
-		if (plugin.getServer().getPlayer(uuid).isOnline())
+		System.out.println("tesdada");
+		if (plugin.getServer().getPlayer(uuid).isOnline()) {
+
 			return plugin.getServer().getPlayer(uuid);
-		else {
-			return (Player) plugin.getServer().getOfflinePlayer(uuid);
 		}
+		return null;
 
 	}
-
 
 	public static boolean isNumber(String c) {
 
@@ -71,15 +72,15 @@ public class Util {
 	}
 
 	public static boolean divEqualsDouInt(int n1, int n2) {
-		
+
 		int div1 = n1 / n2;
 		System.out.println(div1);
 		double div2 = (double) n1 / n2;
 		System.out.println(div2);
-		
-		if(div1 == div2)
+
+		if (div1 == div2)
 			return true;
-		
+
 		return false;
 	}
 
@@ -195,11 +196,13 @@ public class Util {
 		return 0;
 
 	}
+
 	public static String getId(Player player) {
 		UUID uuid = player.getUniqueId();
-		
+
 		return uuid.toString();
 	}
+
 	public static int getId(ItemStack item) {
 		return 0;
 	}
@@ -211,12 +214,11 @@ public class Util {
 		int sz = 0;
 		int s = 0;
 		int div = 0;
-		
-		if(Util.divEqualsDouInt(list.size(), size)) {
-			
+
+		if (Util.divEqualsDouInt(list.size(), size)) {
+
 			div = list.size() / size;
-		}
-		else {
+		} else {
 
 			div = (list.size() / size) + 1;
 		}
@@ -260,7 +262,6 @@ public class Util {
 			if (rest != 0)
 				rest -= size;
 
-
 			mapList.put(i, listString);
 
 			listString = mapList.get(i);
@@ -290,7 +291,15 @@ public class Util {
 		return 0;
 
 	}
-
+	public static boolean isPlayer(UUID player) {
+		if (Bukkit.getPlayer(player) != null) {
+			return true;
+		}
+		if (Bukkit.getOfflinePlayer(player) != null) {
+			return true;
+		}
+		return false;
+	}
 	public static boolean isPlayer(String player) {
 		if (Bukkit.getPlayer(player) != null) {
 			return true;
@@ -307,5 +316,28 @@ public class Util {
 		}
 		return false;
 	}
+	
+
+
+	public static double thisPrice(Sign sign, Player player) {
+		if (!sign.getLine(2).isEmpty()) {
+
+			try {
+
+				return Double.parseDouble(sign.getLine(2));
+			} catch (NumberFormatException e) {
+				// TODO: handle exception
+				System.out.println(sign.getLine(2));
+				if (sign.getLine(2).equalsIgnoreCase("Free")) {
+
+					return 0;
+				}
+				throw new EconomicException("Somente números em preço (*FREE é uma exceção)",player);
+			}
+
+		}
+		return -1;
+	}
+	
 
 }

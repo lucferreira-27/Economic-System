@@ -12,7 +12,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import br.com.enxada.commands.Commands;
 import br.com.enxada.commands.CommandsMarket;
 import br.com.enxada.commands.CommandsUser;
-import br.com.enxada.events.Events;
+import br.com.enxada.events.EventTransfer;
+import br.com.enxada.events.EventsJoin;
 import br.com.enxada.exceptions.DbException;
 import br.com.enxada.exceptions.EconomicException;
 import br.com.enxada.util.Util;
@@ -29,8 +30,12 @@ public class Main extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		
-		Events event = new Events();
-		getServer().getPluginManager().registerEvents((Listener) new Events(), (Plugin) this);
+		EventsJoin eventJoin = new EventsJoin();
+		EventTransfer eventTransfer = new EventTransfer();
+		
+		getServer().getPluginManager().registerEvents((Listener) eventJoin, (Plugin) this);
+		getServer().getPluginManager().registerEvents((Listener) eventTransfer, (Plugin) this);
+		
 		
 		Commands cmd = new Commands();
 		CommandsUser cmdUser = new CommandsUser();
