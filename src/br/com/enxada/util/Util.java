@@ -11,14 +11,20 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 
 import br.com.enxada.Main;
 import br.com.enxada.exceptions.EconomicException;
+import br.com.enxada.model.impl.Market;
+import br.com.enxada.model.impl.User;
 
 public class Util {
 	private static Main plugin = Main.getPlugin(Main.class);
-
+	
+	private static User user = new User();
+	private static Market market = new Market();
+	
 	public static String chat(String s) {
 		return ChatColor.translateAlternateColorCodes('&', s);
 //		&0 Black
@@ -138,7 +144,23 @@ public class Util {
 		}
 
 	}
-
+	
+	public static boolean isRegistredItem(int id) {
+		if(market.itemExist(id))
+			return true;
+		return false;
+	}
+	public static boolean isRegistredItem(String name) {
+		if(market.itemExist(Util.getId(name)))
+			return true;
+		return false;
+	}
+	public static boolean isRegistredItem(ItemStack item) {
+		if(market.itemExist(Util.getId(item)))
+			return true;
+		return false;
+	}
+	
 	public static String getItemName(int id) {
 
 		ItemStack item = new ItemStack(Material.getMaterial(id));
@@ -155,7 +177,7 @@ public class Util {
 		}
 
 	}
-
+	
 	public static String getItemName(ItemStack item) {
 		String name = item.getType().toString();
 		return name;
@@ -295,20 +317,40 @@ public class Util {
 		if (Bukkit.getPlayer(player) != null) {
 			return true;
 		}
-		if (Bukkit.getOfflinePlayer(player) != null) {
-			return true;
-		}
+
 		return false;
 	}
 	public static boolean isPlayer(String player) {
 		if (Bukkit.getPlayer(player) != null) {
 			return true;
 		}
-		if (Bukkit.getOfflinePlayer(player) != null) {
-			return true;
-		}
+
+		
 		return false;
 	}
+	public static boolean isRegistredPlayer(Player player) {
+
+		if(user.playerExist(player.getUniqueId()))
+			return true;
+		return false;
+	}
+	
+	public static boolean isRegistredPlayer(String name) {
+		if(isPlayer(name))
+			if(user.playerExist(getPlayer(name).getUniqueId()) && !name.equals("")) {
+				
+				return true;
+			}
+		System.out.println(name);
+		return false;
+	}
+	public static boolean isRegistredPlayer(UUID uuid) {
+		if(isPlayer(uuid))
+			if(user.playerExist(uuid))
+				return true;
+		return false;
+	}
+	
 
 	public static boolean isOnlinePlayers(String player) {
 		if (Bukkit.getPlayer(player) != null) {
@@ -316,8 +358,15 @@ public class Util {
 		}
 		return false;
 	}
+	public static Player getPlayer(String string) {
+		if(isPlayer(string)) {
+			
+			return Bukkit.getServer().getPlayer(string);
+			
+		}
+		return null;
+	}
 	
-
 
 	public static double thisPrice(Sign sign, Player player) {
 		if (!sign.getLine(2).isEmpty()) {
@@ -339,5 +388,26 @@ public class Util {
 		return -1;
 	}
 	
-
+	public static boolean signIsEmpty(Sign sign) {
+		
+		for(String line : sign.getLines()) {
+				if(!line.equalsIgnoreCase("")) {
+					return false;
+				}
+		}
+		
+		return true;
+	}
+	public static boolean signLineisEmpty(Sign sign, int p) {
+		if(sign.getLine(p).equalsIgnoreCase("")) {
+			return true;
+		}
+		return false;
+	}
+	public static void callEvent(Event event) {
+		Bukkit.getServer().getPluginManager().callEvent(event);
+	}
+	public static boolean isShopRegistred() {
+		return false;
+	}
 }
