@@ -34,16 +34,17 @@ public class CommandsUser extends CommandExecute implements CommandExecutor, Lis
 			
 			if(args.length == 0) {
 				
-				value = user.getBalance(player);
+				value = user.getBalance(player.getUniqueId());
 				player.sendMessage(Util.chat("&eSaldo: &a" +  String.valueOf(value)));
 				
 				return true;
 			
-			}else if(Bukkit.getPlayer(args[0]) != null){
+			}else if(Util.getOfflinePlayer(args[0]) != null){
 				
-				Player playerTarget = Bukkit.getPlayer(args[0]);
+				OfflinePlayer playerTarget = Util.getOfflinePlayer(args[0]);
 				
-				value = user.getBalance(playerTarget);
+				
+				value = user.getBalance(playerTarget.getUniqueId());
 				if(sender instanceof Player) {
 					player.sendMessage(Util.chat("&eSaldo: &a" +  String.valueOf(value)));
 				}else
@@ -58,19 +59,22 @@ public class CommandsUser extends CommandExecute implements CommandExecutor, Lis
 		if(cmd.getName().equalsIgnoreCase(cmdAtualizarSaldo)) {
 			if(args.length != 0) {
 				double value = 0;
-				Player playerTarget;
-				if(args.length == 1 && (Bukkit.getPlayer(args[0]) == null) ) {
+				OfflinePlayer playerTarget = Util.getOfflinePlayer(args[0]);
+				
+				if(args.length == 1 && (playerTarget!= null) ) {
 					value = Double.parseDouble(args[0]);
 					
-					user.updatePlayer(player, value);
+					user.updatePlayer(playerTarget.getUniqueId(), value);
 					player.sendMessage(Util.chat("&eSaldo atualizado com sucesso!"));
 					return true;
 				}
-				if(args.length == 2 && user.playerExist(Bukkit.getPlayer(args[0]).getUniqueId())) {
-
-					playerTarget =  Bukkit.getPlayerExact(args[0]);
+				if(args.length == 2 && user.playerExist(Util.getOfflinePlayer(args[0]).getUniqueId())) {
+					
+					if(Util.isRegistredPlayer(args[0]))
+						playerTarget =  Util.getOfflinePlayer(args[0]);
+					
 					value = Double.parseDouble(args[1]);
-					user.updatePlayer(playerTarget, value);
+					user.updatePlayer(playerTarget.getUniqueId(), value);
 					player.sendMessage(Util.chat("&eSaldo atualizado com sucesso!"));
 					return true;
 
@@ -86,20 +90,13 @@ public class CommandsUser extends CommandExecute implements CommandExecutor, Lis
 		}if(cmd.getName().equalsIgnoreCase(cmdDeletarConta)) {
 			if(args.length != 0) {
 				
-				Player playerOnTarget = null;
-				OfflinePlayer playerOffTarget = null;
+				OfflinePlayer playerTarget = null;
 				
 					
-					if(user.playerExist(Bukkit.getPlayer(args[0]).getUniqueId())) {
+					if(user.playerExist(Util.getOfflinePlayer(args[0]).getUniqueId())) {
 						
-						playerOnTarget = Bukkit.getPlayerExact(args[0]);
-						user.deletePlayer(playerOnTarget);
-						return true;
-					}
-					if(user.playerExist(Bukkit.getOfflinePlayer(args[0]).getUniqueId())) {
-					
-						playerOffTarget = Bukkit.getOfflinePlayer(args[0]);
-						user.deletePlayer(playerOffTarget);
+						playerTarget = Util.getOfflinePlayer(args[0]);
+						user.deletePlayer(playerTarget.getUniqueId());
 						return true;
 					}
 					player.sendMessage(Util.chat("&cNão foi possivel encontrar o Player"));
@@ -113,11 +110,11 @@ public class CommandsUser extends CommandExecute implements CommandExecutor, Lis
 		}
 		if(cmd.getName().equalsIgnoreCase(cmdAddConta)) {
 			if(args.length != 0) {
-				if(Bukkit.getPlayer(args[0]) != null) {
+				if(Util.getOfflinePlayer(args[0]) != null) {
 					
-					Player playerTarget = Bukkit.getPlayerExact(args[0]);
-					user.addPlayer(playerTarget);
-					player.sendMessage(Util.chat("&a"+ playerTarget.getDisplayName()+ " &eadicionado!"));
+					OfflinePlayer playerTarget = Util.getOfflinePlayer(args[0]);
+					user.addPlayer(playerTarget.getUniqueId());
+					player.sendMessage(Util.chat("&a"+ playerTarget.getName()+ " &eadicionado!"));
 					return true;
 					
 				}else {
@@ -130,15 +127,15 @@ public class CommandsUser extends CommandExecute implements CommandExecutor, Lis
 		}
 		if(cmd.getName().equalsIgnoreCase(cmdListarPlayers)) {
 			
-			List<Player> listPlayer = user.listPlayers();
+			List<OfflinePlayer> listPlayer = user.listPlayers();
 			Map map = Util.divList(listPlayer, 10);
 			if(map == null) {
 				player.sendMessage(Util.chat("&f----------&6[Lista]&7 (1/1)&f--------------------"
 				+"\n&7Use /listarplayers [n] para ir para pagina n \n&f----&aNOME &f---------------&aSaldo&f-------------"));
  
-				for(Player p : listPlayer) {
-					double balance = user.getBalance(p);
-					String name = p.getDisplayName();
+				for(OfflinePlayer p : listPlayer) {
+					double balance = user.getBalance(p.getUniqueId());
+					String name = p.getName();
 					player.sendMessage(Util.chat("-> &eNome: &a" + name + " &eSaldo: &a" + balance));
 				}
 				return true;
@@ -149,13 +146,13 @@ public class CommandsUser extends CommandExecute implements CommandExecutor, Lis
 				player.sendMessage(Util.chat("&f----------&6[Lista]&7 (1/" +Util.mapKeyQuantity(map) +")&f--------------------"
 				+"\n&7Use /listarplayers [n] para ir para pagina n \n&f----&aNOME &f----&aSaldo"));
 				if(map.get(1) != null) {
-					listPlayer = (List<Player>) map.get(1);
+					listPlayer = (List<OfflinePlayer>) map.get(1);
 				}else {
 			
 				}
-				for(Player p : listPlayer) {
-					double balance = user.getBalance(p);
-					String name = p.getDisplayName();
+				for(OfflinePlayer p : listPlayer) {
+					double balance = user.getBalance(p.getUniqueId());
+					String name = p.getName();
 					player.sendMessage(Util.chat("-> &eNome: &a" + name + " &eSaldo: &a" + balance));
 				}
 			}

@@ -1,5 +1,6 @@
 package br.com.enxada.events;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
@@ -26,8 +27,10 @@ public class EventsJoin implements Listener {
 
 		Player player = event.getPlayer();
 
+
 		if (!tablePlayer.playerExist(player.getUniqueId()))
-			tablePlayer.addPlayer(player);
+			
+			tablePlayer.addPlayer(player.getUniqueId());
 	}
 
 

@@ -1,26 +1,31 @@
 package br.com.enxada.service;
 
-import java.util.UUID;
-
+import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
 import br.com.enxada.exceptions.EconomicException;
 import br.com.enxada.model.impl.Market;
 import br.com.enxada.model.impl.User;
+import br.com.enxada.util.InventoriesUtil;
 import br.com.enxada.util.TransactionUtil;
 import br.com.enxada.util.Util;
 
 public class TransactionBuy extends Transaction {
 	private Market market = new Market();
 	private User user = new User();
-	private Player player;
-	private Player shopOwn;
-
-	public TransactionBuy(Sign sign, Player player) {
-		super(sign, player);
+	private OfflinePlayer player;
+	private OfflinePlayer shopOwn;
+	private Player playerOn = null;
+	private Player shopOwnOn;
+	public TransactionBuy(Sign sign, org.bukkit.material.Sign signMaterial, Player player) {
+		super(sign, signMaterial, player);
 		// TODO Auto-generated constructor stub
 		this.player = getPlayer();
+		if(player.isOnline()) {
+			playerOn = player;
+		}
 	}
 
 
@@ -28,7 +33,7 @@ public class TransactionBuy extends Transaction {
 	public void doTransaction() {
 		// TODO Auto-generated method stub
 		if (allowTransaction()) {
-			System.out.println(getOwnShopId());
+			System.out.println(getOwnShopIdOff());
 			
 			
 			double price;
@@ -43,31 +48,42 @@ public class TransactionBuy extends Transaction {
 			
 			if(checkBalance(getPlayer(), getItemId()) >= 0) {
 				
-				shopOwn = getOwnShopId();
+				shopOwn = getOwnShopIdOff();
+				if(shopOwn.isOnline()) 
+					shopOwnOn = Util.getPlayer(shopOwn);
 				
-				double oldBalance = user.getBalance(player);
-				double oldShopBalance = user.getBalance(getShopId());
 				
-				TransactionUtil.sellTranserShop(getShopId(), oldShopBalance, getPrice());
+				double oldBalance = user.getBalance(player.getUniqueId());
+				double oldShopBalance = user.getBalance(getShopIdOff().getUniqueId());
+				
+				TransactionUtil.sellTranserShop(getShopIdOff(), oldShopBalance, getPrice());
 				TransactionUtil.buyTranserClient(getPlayer(), oldBalance, getPrice());
 				
-				double balance = user.getBalance(getPlayer());
-				double shopBalance = user.getBalance(getShopId());
+				setChest(Util.getChestInLocation(getLoc()));
+				InventoriesUtil.trasecItem(getChest(), getPlayer(), Util.getItemStack(getItemId()));
 				
-				//System.out.println("--------------->Cliente: " + balance +":"+ getPlayer().toString());
-				//System.out.println("---------------->Mercado: " + shopBalance +":"+ getOwnShopId().toString());
+				double balance = user.getBalance(getPlayer().getUniqueId());
+				double shopBalance = user.getBalance(getShopIdOff().getUniqueId());
 				
-				player.sendMessage(Util.chat("&eSaldo atual: &a" + balance + " &eSaldo antigo: &a"+ oldBalance +"\n&ePreço: &a" + price));
-				player.sendMessage(Util.chat("&aTransação realizada!"));
+				System.out.println("--------------->Cliente: " + balance +":"+ getPlayer().toString());
+				System.out.println("---------------->Mercado: " + shopBalance +":"+ getOwnShopIdOff().toString());
 				
 				
-				shopOwn.sendMessage(Util.chat("&eVoce recebeu &a" + price + " &ede " + player.getName()));
-
+					
+					playerOn.sendMessage(Util.chat("&eSaldo atual: &a" + balance + " &eSaldo antigo: &a"+ oldBalance +"\n&ePreço: &a" + price));
+					playerOn.sendMessage(Util.chat("&aTransação realizada!"));
+				
+				
+				if(shopOwn.isOnline()) {
+					shopOwnOn.sendMessage(Util.chat("&eVoce recebeu &a" + price + " &ede " +shopOwnOn.getName()));
+					if(getPlayer().isOnline())
+						getPlayer().sendMessage(Util.chat("&eForam enviados  &a" + price + " &ede sua conta para &a" + shopOwnOn.getName()));
+				}
 				return;
 			}else {
 				
-				player.sendMessage(Util.chat("&eSaldo insuficiente"));
-				player.sendMessage(Util.chat("&cTransação falhou!"));
+				playerOn.sendMessage(Util.chat("&eSaldo insuficiente"));
+				playerOn.sendMessage(Util.chat("&cTransação falhou!"));
 				return;
 			
 			}
@@ -76,8 +92,8 @@ public class TransactionBuy extends Transaction {
 			
 		}
 		
-		player.sendMessage(Util.chat("&cTransação falhou!"));
-		throw new EconomicException("Algo inesperado aconteceu!");
+		if(player.isOnline())
+			cancelTrasaction("&cTransação falhou!");
 	}
 
 	

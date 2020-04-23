@@ -9,14 +9,14 @@ import org.bukkit.entity.Player;
 public interface UserDAO {
 	boolean playerExist(UUID uuid);
 	
-	void addPlayer(Player player);
-	void updatePlayer(Player player, double value);
-	void deletePlayer(Player player);
-	void deletePlayer(OfflinePlayer player);
+	void addPlayer(UUID uuid);
+	void updatePlayer(UUID uuid, double value);
+	void deletePlayer(UUID uuid);
+
 	
 
 	
-	double getBalance(Player player);
+	double getBalance(UUID uuid);
 	
 	List<String> listPlayersNames();
 	

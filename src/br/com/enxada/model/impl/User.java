@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 
 import br.com.enxada.Main;
 import br.com.enxada.exceptions.DbException;
-import br.com.enxada.exceptions.EconomicException;
 import br.com.enxada.model.UserDAO;
 import br.com.enxada.util.Util;
 
@@ -41,21 +40,27 @@ public class User implements UserDAO {
 	}
 
 	@Override
-	public void addPlayer(Player player) {
+	public void addPlayer(UUID uuid) {
 		// TODO Auto-generated method stub
 		try {
 		PreparedStatement st = null;
 		ResultSet rs = null;
-		UUID uuid = player.getUniqueId();
+		OfflinePlayer player = Util.fromUUID(uuid);
+		Player playerOnline = null;
+		if(player.isOnline()) {
+			 playerOnline = Util.getPlayer(uuid);
+		}
 		if(!playerExist(uuid)) {
 			st = plugin.getConnection().prepareStatement("INSERT INTO Players (Id,Name,Balance) VALUES (?,?,?)");
 			st.setString(1, uuid.toString());
-			st.setString(2, player.getDisplayName());
+			st.setString(2, player.getName());
 			st.setDouble(3, 1000.00);
 			st.executeUpdate();
-			player.sendMessage(Util.chat("&a[Player Adicionado]"));
+			if(player.isOnline())
+				playerOnline.sendMessage(Util.chat("&a[Player Adicionado]"));
 		}else {
-			player.sendMessage(Util.chat("&cERROR: Player já adicionado"));
+			if(player.isOnline())
+				playerOnline.sendMessage(Util.chat("&cERROR: Player já adicionado"));
 		}
 		}catch (SQLException e) {
 			// TODO: handle exception
@@ -64,11 +69,11 @@ public class User implements UserDAO {
 	}
 
 	@Override
-	public void updatePlayer(Player player, double value) {
+	public void updatePlayer(UUID uuid, double value) {
 		// TODO Auto-generated method stub
 		PreparedStatement st = null;
 		ResultSet rs = null;
-		UUID uuid = player.getUniqueId();
+
 		try {
 			if(playerExist(uuid)) {
 				st = plugin.getConnection().prepareStatement("UPDATE Players SET Balance = ? WHERE ID = ?");
@@ -82,33 +87,13 @@ public class User implements UserDAO {
 		}
 	}
 
+
 	@Override
-	public void deletePlayer(Player player) {
+	public void deletePlayer(UUID uuid) {
 		// TODO Auto-generated method stub
 		PreparedStatement st = null;
 		ResultSet rs = null;
-		UUID uuid = player.getUniqueId();
-		try {
-			if(playerExist(uuid)) {
-				st = plugin.getConnection().prepareStatement("DELETE FROM " + plugin.getTablePlayers() +  " WHERE ID = ?");
-				st.setString(1, uuid.toString());
-				st.executeUpdate();
-				Bukkit.broadcastMessage(Util.chat("&5PLAYER &c" +player.getDisplayName() +" &5FOI DELETADO"));
-				return;
-			}
-			
-		}catch (SQLException e) {
-			// TODO: handle exception
-			throw new DbException(e.getMessage());
-		}
-		
-	}
-	@Override
-	public void deletePlayer(OfflinePlayer player) {
-		// TODO Auto-generated method stub
-		PreparedStatement st = null;
-		ResultSet rs = null;
-		UUID uuid = player.getUniqueId();
+		OfflinePlayer player = Util.fromUUID(uuid);
 		try {
 			if(playerExist(uuid)) {
 				st = plugin.getConnection().prepareStatement("DELETE FROM " + plugin.getTablePlayers() +  " WHERE ID = ?");
@@ -127,12 +112,12 @@ public class User implements UserDAO {
 
 
 
-	@Override
-	public double getBalance(Player player) {
+	
+	public double getBalance(UUID uuid) {
 		// TODO Auto-generated method stub
 		PreparedStatement st = null;
 		ResultSet rs = null;
-		UUID uuid = player.getUniqueId();
+
 		try {
 			if(playerExist(uuid)) {
 			st = plugin.getConnection().prepareStatement("SELECT Balance FROM " + plugin.getTablePlayers() + " WHERE Id = ?");
@@ -171,14 +156,14 @@ public class User implements UserDAO {
 		}
 	
 	}
-	public List<Player> listPlayers(){
-		List<Player> listPlayer = new ArrayList<>();
+	public List<OfflinePlayer> listPlayers(){
+		List<OfflinePlayer> listPlayer = new ArrayList<>();
 		List<String> listName = new ArrayList<>();
 		listName = listPlayersNames();
 		
 		for(String name : listName) {
 			
-			Player p = Bukkit.getPlayer(name);
+			OfflinePlayer p = Util.getOfflinePlayer(name);
 			listPlayer.add(p);
 			
 		}

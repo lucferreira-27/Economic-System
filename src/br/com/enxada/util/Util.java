@@ -8,10 +8,17 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import br.com.enxada.Main;
@@ -52,13 +59,12 @@ public class Util {
 		plugin.getServer().broadcastMessage(chat("&6--------- CHAT APAGADO! ---------"));
 	}
 
-	public static Player fromUUID(UUID uuid) {
+	public static OfflinePlayer fromUUID(UUID uuid) {
 		System.out.println("tesdada");
-		if (plugin.getServer().getPlayer(uuid).isOnline()) {
+	
 
-			return plugin.getServer().getPlayer(uuid);
-		}
-		return null;
+			return plugin.getServer().getOfflinePlayer(uuid);
+
 
 	}
 
@@ -324,6 +330,9 @@ public class Util {
 		if (Bukkit.getPlayer(player) != null) {
 			return true;
 		}
+		if(Bukkit.getOfflinePlayer(player) != null) {
+			return true;
+		}
 
 		
 		return false;
@@ -337,9 +346,18 @@ public class Util {
 	
 	public static boolean isRegistredPlayer(String name) {
 		if(isPlayer(name))
-			if(user.playerExist(getPlayer(name).getUniqueId()) && !name.equals("")) {
-				
-				return true;
+			try {
+				if(user.playerExist(getPlayer(name).getUniqueId()) && !name.equals("")) {
+					
+					return true;
+				}
+			}catch (NullPointerException e) {
+				// TODO: handle exception
+				if(user.playerExist(getOfflinePlayer(name).getUniqueId()) && !name.equals("")) {
+					
+					return true;
+				}
+				return false;
 			}
 		System.out.println(name);
 		return false;
@@ -366,9 +384,47 @@ public class Util {
 		}
 		return null;
 	}
-	
+	public static Player getPlayer(UUID uuid) {
+		if(isPlayer(uuid)) {
+			
+			return Bukkit.getServer().getPlayer(uuid);
+			
+		}
+		return null;
+	}
+	public static Player getPlayer(OfflinePlayer playeroff) {
+		if(playeroff.isOnline()) {
+			return getPlayer(playeroff.getName());
+		}
+		return null;
+	}
 
-	public static double thisPrice(Sign sign, Player player) {
+	public static OfflinePlayer getOfflinePlayer(String string) {
+		if(isPlayer(string)) {
+			
+			return Bukkit.getServer().getOfflinePlayer(string);
+			
+		}
+		return null;
+	}
+
+	public static OfflinePlayer getOfflinePlayer(Player player) {
+		
+		if(!player.isOnline()) {
+			return getOfflinePlayer(player.getName());		
+		}
+		return null;
+	}
+	
+	public static OfflinePlayer getOfflinePlayer(UUID uuid) {
+		
+		if(Bukkit.getOfflinePlayer(uuid) != null) {
+			return Bukkit.getOfflinePlayer(uuid);
+		}
+		return null;
+		
+	}	
+ 	public static double thisPrice(Sign sign, Player player) {
 		if (!sign.getLine(2).isEmpty()) {
 
 			try {
@@ -408,6 +464,114 @@ public class Util {
 		Bukkit.getServer().getPluginManager().callEvent(event);
 	}
 	public static boolean isShopRegistred() {
+
+		return false;
+	}
+	
+	public static BlockFace getClosestFace(float direction) {
+        direction = direction % 360;
+
+        if (direction < 0)
+            direction += 360;
+
+        direction = Math.round(direction / 45);
+
+        switch ((int) direction) {
+        case 0:
+            return BlockFace.WEST;
+        case 1:
+            return BlockFace.NORTH_WEST;
+        case 2:
+            return BlockFace.NORTH;
+        case 3:
+            return BlockFace.NORTH_EAST;
+        case 4:
+        	return BlockFace.EAST;
+        case 5:
+            return BlockFace.SOUTH_EAST;
+        case 6:
+            return BlockFace.SOUTH;
+        case 7:
+            return BlockFace.SOUTH_WEST;
+        default:
+            return BlockFace.WEST;
+        
+        
+        }
+	}
+	public static Location getSignWallOrientation(org.bukkit.material.Sign signMaterial, Sign signBlock ,Player player) {
+		
+		BlockFace signFace = signMaterial.getFacing();
+		
+		System.out.println(signFace);
+		
+		if(signFace.toString().equalsIgnoreCase("North")) {
+			Location loc = new Location(player.getWorld(), signBlock.getX(), signBlock.getY(), signBlock.getZ() + 1);
+			return loc;
+		}
+		if(signFace.toString().equalsIgnoreCase("West")) {
+			Location loc = new Location(player.getWorld(), signBlock.getX() + 1, signBlock.getY(), signBlock.getZ());
+			return loc;
+		}
+		if(signFace.toString().equalsIgnoreCase("East")) {
+			Location loc = new Location(player.getWorld(), signBlock.getX() - 1, signBlock.getY(), signBlock.getZ());
+			return loc;
+		}
+		if(signFace.toString().equalsIgnoreCase("South")) {
+			Location loc = new Location(player.getWorld(), signBlock.getX(), signBlock.getY(), signBlock.getZ() - 1);
+			return loc;
+		}
+		return null;
+	}
+	public static Location getFrontBlock(Block block , Player player) {
+		
+		Location pLocation = player.getLocation();
+		BlockFace face =  getClosestFace(pLocation.getYaw());
+		System.out.println(face);
+		
+		return null;
+	}
+	
+	public static boolean isSignInChest(Location loc) {
+		
+		Material material = whatBlockTypeInLocation(loc);
+		if(material.equals(Material.CHEST)){
+			return true;
+		}
+		return false;
+	}
+
+	public static Location getBehindBlock(Block block, Player player) {
+		Location loc = block.getLocation();
+		BlockFace face = block.getFace(block);
+		
+		return null;
+	}
+	public static Block getBlockInLocation(Location loc) {
+		
+		if(loc != null)
+			return loc.getBlock();
+		return null;
+	}
+	public static Chest getChestInLocation(Location loc) {
+		
+		if(loc != null) {
+			System.out.println(loc.getBlock().getType());
+			if(loc.getBlock().getType().equals(Material.CHEST)) {
+				return (Chest)loc.getBlock().getState();
+			}
+			
+		}
+		return null;
+	}
+	
+	public static Material whatBlockTypeInLocation(Location loc) {
+		return loc.getBlock().getType();
+	}
+	public static boolean checkTypeBlock(Block block1, Block block2) {
+		if(block1.getType() == block2.getType()) {
+			return true;
+		}	
 		return false;
 	}
 }

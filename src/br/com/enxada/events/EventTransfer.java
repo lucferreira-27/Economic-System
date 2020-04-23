@@ -1,14 +1,13 @@
 package br.com.enxada.events;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 
 import br.com.enxada.service.Transaction;
 import br.com.enxada.service.TransactionBuy;
@@ -25,12 +24,12 @@ public class EventTransfer implements Listener {
 			
 			if (state instanceof Sign) {
 				Sign sign = (Sign) state;
-	
+				org.bukkit.material.Sign signMaterial = (org.bukkit.material.Sign) state.getData();
 				String line = sign.getLine(0);
 	
 				if (line.equals("Comprar") || line.equals("Buy")) {
 					
-					Transaction transaction = new Transaction(sign, player);
+					Transaction transaction = new Transaction(sign,signMaterial,player);
 					transaction.registerShop(player);
 	
 	
@@ -38,7 +37,7 @@ public class EventTransfer implements Listener {
 				}
 				
 				if (line.equals("Vender") || line.equals("Sell")) {
-					Transaction transaction = new Transaction(sign, player);
+					Transaction transaction = new Transaction(sign,signMaterial,player);
 					transaction.registerShop(player);
 	
 				}
@@ -56,25 +55,30 @@ public class EventTransfer implements Listener {
 		Block block = (Block) event.getClickedBlock();
 		BlockState state = block.getState();
 		
+		Util.getFrontBlock(block, player);
+		
 		if(player.isSneaking()) 
 			return;
 		
 		if (state instanceof Sign) {
 			Sign sign = (Sign) state;
-
+			org.bukkit.material.Sign signMaterial = (org.bukkit.material.Sign) state.getData();
+			Location loc = Util.getSignWallOrientation(signMaterial, sign, player);
+			System.out.println(loc.getBlock());
 			String line = sign.getLine(0);
 
 			if (line.equals("Comprar") || line.equals("Buy")) {
 				
-				TransactionBuy buy = new TransactionBuy(sign, player);
+				TransactionBuy buy = new TransactionBuy(sign,signMaterial,player);
 				player.sendMessage(Util.chat("&a[Comprar]"));
 				buy.doTransaction();
+				
 
 			}
 			if (line.equals("Vender") || line.equals("Sell")) {
 				player.sendMessage(Util.chat("&e[Vender]"));
 				
-				TransactionSell sell = new TransactionSell(sign, player);
+				TransactionSell sell = new TransactionSell(sign,signMaterial,player);
 				sell.doTransaction();
 			}
 		}

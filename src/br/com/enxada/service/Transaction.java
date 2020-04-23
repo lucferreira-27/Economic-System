@@ -2,6 +2,10 @@ package br.com.enxada.service;
 
 import java.util.UUID;
 
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
@@ -16,24 +20,34 @@ public class Transaction {
 	private User user = new User();
 
 	private Sign sign = null;
+	private org.bukkit.material.Sign signMaterial = null;
 	private String transactionType = null;
 	
 	private Player player;
+	private OfflinePlayer playerOff;
+	private Player shopIdOn = null;
+	private OfflinePlayer shopId = null;
 	
-	private  Player shopId = null;
 	
 	private UUID playerId;
 	private int itemId = 0;
 	private String itemIdString = null;
 	private double price = 0;
-
-	public Transaction(Sign sign, Player player) {
+	private Chest chest = null;
+	private Location loc = null;
+	public Transaction(Sign sign,org.bukkit.material.Sign signMaterial, Player player) {
 		// TODO Auto-generated constructor stub
+		
 		this.sign = sign;
+		this.signMaterial = signMaterial;
 		this.transactionType = sign.getLine(0);
 		this.itemIdString = sign.getLine(1);
 		this.player = player;
+		this.playerOff = player;
 		this.price = Util.thisPrice(sign, player);
+		this.loc = Util.getSignWallOrientation(getSignMaterial(),getSign(), getPlayer());
+
+
 	}
 
 	public boolean allowTransaction() {
@@ -84,15 +98,18 @@ public class Transaction {
 			getPlayer().sendMessage(own);
 			return true;
 		}
-		if(!own.equals(""))
+		if(!own.equals("")) {
 			getPlayer().sendMessage(Util.chat("&cShop de &e"+ own +" &cnão registrado!"));
+			return false;
+		}
+		
 		getPlayer().sendMessage(Util.chat("&cShop não registrado!"));
 
 		return false;
 	}
 
-	protected int checkBalance(Player player, int itemId) {
-		double balance = user.getBalance(getPlayer());
+	protected int checkBalance(OfflinePlayer player, int itemId) {
+		double balance = user.getBalance(getPlayer().getUniqueId());
 		double price = market.getPrice(itemId);
 		System.out.println("\n" + balance);
 		System.out.println("\n" + price);
@@ -117,8 +134,8 @@ public class Transaction {
 			
 			sign.setLine(3, ownShopName);
 			sign.update();
-			setOwnShop(player);
-			setShopId(Util.getPlayer(ownShopName));
+			setOwnShopOn(player);
+			setShopIdOff(Util.getPlayer(ownShopName));
 			
 			player.sendMessage(Util.chat("&eShop de &a" + player.getName() + " &eregistrado."));
 			return;
@@ -130,18 +147,29 @@ public class Transaction {
 
 	}
 
+	public void cancelTrasaction(String msg) {
+		throw new EconomicException("-Transação cancelada\n"+msg, getPlayer());
+		
+	}
 	public void cancelTrasaction() {
-		throw new EconomicException("Transação cancelada", getPlayer());
+		throw new EconomicException("-Transação cancelada", getPlayer());
 		
 	}
 
 	public void registerShop(Player player) {
 		String own = getSign().getLine(3);
 		if (Util.signLineisEmpty(getSign(), 3)) {
-			setOwnShopId(getSign(), player);
+
+			if(Util.isSignInChest(loc)) {
+				setOwnShopId(getSign(), player);
+				return;
+			}
+			cancelTrasaction("&cPlaca deve estar em um baú!");
 			return;
 		}
 		if(Util.isRegistredPlayer(own)) {
+
+			
 			getPlayer().sendMessage(Util.chat("&eShop já &aregristrado!"));
 			return;
 		}
@@ -209,22 +237,62 @@ public class Transaction {
 		this.price = price;
 	}
 
-	public  Player getOwnShopId() {
+	public  OfflinePlayer getOwnShopIdOff() {
 		String p = getSign().getLine(3);
-		shopId = Util.getPlayer(p);
+		shopId = Util.getOfflinePlayer(p);
 		return shopId;
 	}
 
-	public  void setOwnShop(Player playerShopId) {
+	public  void setOwnShopOn(Player playerShopId) {
 		shopId = playerShopId;
 	}
 
-	public Player getShopId() {
+	public OfflinePlayer getShopIdOff() {
 		return shopId;
 	}
 
-	public void setShopId(Player shopId) {
+	public void setShopIdOff(Player shopId) {
 		this.shopId = shopId;
+	}
+
+	public OfflinePlayer getPlayerOff() {
+		return playerOff;
+	}
+
+	public void setPlayerOff(OfflinePlayer playerOff) {
+		this.playerOff = playerOff;
+	}
+
+	public Player getShopIdOn() {
+		return shopIdOn;
+	}
+
+	public void setShopIdOn(Player shopIdOn) {
+		this.shopIdOn = shopIdOn;
+	}
+
+	public org.bukkit.material.Sign getSignMaterial() {
+		return signMaterial;
+	}
+
+	public void setSignBlock(org.bukkit.material.Sign signMaterial) {
+		this.signMaterial = signMaterial;
+	}
+
+	public Chest getChest() {
+		return chest;
+	}
+
+	public void setChest(Chest chest) {
+		this.chest = chest;
+	}
+
+	public Location getLoc() {
+		return loc;
+	}
+
+	public void setLoc(Location loc) {
+		this.loc = loc;
 	}
 	
 }
